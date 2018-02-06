@@ -1,0 +1,21 @@
+server:
+  port: 6666
+
+spring:
+  profiles:
+    active: cloud
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://
+          # uri conf for native git.
+          #uri: ${HOME}/Desktop/conf
+          basedir: target/config
+management:
+  context-path: /admin
+
+logging:
+  level:
+    com.netflix.discovery: 'OFF'
+org.springframework.cloud: 'DEBUG'
