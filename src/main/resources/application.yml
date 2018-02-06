@@ -8,14 +8,7 @@ spring:
     config:
       server:
         git:
-          uri: https://
+          #uri: https://
           # uri conf for native git.
-          #uri: ${HOME}/Desktop/conf
+          uri: ${HOME}/Desktop/conf
           basedir: target/config
-management:
-  context-path: /admin
-
-logging:
-  level:
-    com.netflix.discovery: 'OFF'
-org.springframework.cloud: 'DEBUG'
