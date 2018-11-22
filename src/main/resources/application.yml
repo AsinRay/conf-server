@@ -2,13 +2,11 @@ server:
   port: 6666
 
 spring:
-  profiles:
-    active: cloud
   cloud:
     config:
       server:
         git:
           #uri: https://
           # uri conf for native git.
-          uri: ${HOME}/Desktop/conf
+          uri: ${HOME}/conf-repo
           basedir: target/config
