@@ -31,6 +31,6 @@ hs_err_pid*
 *.prefs
 .vscode
 .gradle
-/bin
-/build
+bin
+build
 .logs
