@@ -1,0 +1,108 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'net.sf.proguard:proguard-gradle:6.0.3'
+    }
+}
+
+import proguard.gradle.ProGuardTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'tk.xboot'
+version = '1.6.0'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://192.168.0.23:8081/repository/spring-public" }
+}
+
+configurations {
+    compile.exclude module: 'spring-boot-starter-tomcat'
+    compile.exclude module: 'undertow-websockets-jsr'
+    compile.exclude module: 'log4j-api'
+    compile.exclude module: 'log4j-to-slf4j'
+    compile.exclude module: 'jul-to-slf4j'
+    compile.exclude module: 'hibernate-validator'
+}
+
+ext {
+    springCloudVersion = 'Greenwich.RELEASE'
+}
+
+dependencies {
+    //compileOnly('org.springframework.boot:spring-boot-starter-undertow')
+    implementation('org.springframework.boot:spring-boot-starter-undertow')
+    implementation('org.springframework.cloud:spring-cloud-config-server')
+    implementation('org.springframework.cloud:spring-cloud-starter-config')
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.boot:spring-boot-configuration-processor')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+/*
+
+// escape ordrialy jar
+bootJar {
+    mainClassName = 'tk.xboot.conf.Boot'
+}
+
+// 混淆任务
+task proguard(type: ProGuardTask, dependsOn: compileJava) {
+    // 输出混淆前->混淆后的映射
+    printmapping "$buildDir/mapping.txt"
+    // 混淆规则文件
+    configuration 'proguard-rules.pro'
+
+    // 混淆runtime libs.
+    libraryjars files(configurations.compile.findAll {}.collect())
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    libraryjars "${System.getProperty('java.home')}/lib/jce.jar"
+
+    // 混淆输入
+    injars sourceSets.main.output
+    // 混淆输出
+    outjars "$buildDir/classes-pro"
+}
+
+// 混淆打包
+task bootPro(type: BootJar) {
+    dependsOn 'proguard'
+    // 重新组织boot-inf下的文件
+    bootInf {
+        into('classes') {
+            from "$buildDir/classes-pro"
+        }
+
+        into('lib') {
+            from configurations.runtime
+        }
+
+    }
+    // 包名
+    baseName = "x"
+    // 入口
+    mainClassName = 'tk.xboot.conf.Boot'
+
+    doLast {
+        new File("$buildDir/classes-pro").deleteDir()
+    }
+}*/
