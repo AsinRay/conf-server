@@ -30,9 +30,8 @@ hs_err_pid*
 .classpath
 *.prefs
 .vscode
-.bin
+/bin
 
 .gradle
 .build
-
 .logs
