@@ -18,6 +18,8 @@
 *.tar.gz
 *.rar
 
+/bin
+
 .idea
 *.iml
 /target
