@@ -15,9 +15,11 @@
     <!--      WARING
     Generating the file F / file 、caller class (C{length}/class{length}) 、line number (L / line) 、method name (M / method )
     information is not particularly fast -->
+
     <property name="LOG_PATH" value="logs"/>
-    <property name="CON_PATTERN"
-              value="%highlight([%-5level]) %d{yy-MM-dd HH:mm:ss.SSS} %boldYellow([%-9thread])  %logger{32}:%line - %msg%n"/>
+    <property name="LOG_FILE_MAX_SIZE" value="20mb"/>
+    <property name="LOG_FILE_MAX_HISTORY" value="365" />
+    <property name="CON_PATTERN" value="%highlight([%-5level]) %d{yy-MM-dd HH:mm:ss.SSS} %boldYellow([%-9thread])  %logger{32}:%line - %msg%n"/>
     <property name="DEF_PATTERN" value="%d{HH:mm:ss.SSS} [%.8thread] %-5level %logger{32}:%line - %msg%n"/>
     <property name="TRC_PATTERN" value="%d{HH:mm:ss.SSS} [%.8thread] %-5level %logger{15} - [%-10X{TRC_ID}] %msg%n"/>
     <property name="AUDIT_PTN" value="%d{HH:mm:ss.SSS} %-5level %logger{15} -%msg%n"/>
@@ -48,13 +50,12 @@
     <!-- ch.qos.logback.core.rolling.RollingFileAppender 文件日志输出 -->
     <appender name="access" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${LOG_PATH}/access.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <MaxHistory>180</MaxHistory>
-            <FileNamePattern>${LOG_PATH}/access-%d{yyyy-MM-dd}_%i.log.zip</FileNamePattern>
-            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxFileSize>50MB</MaxFileSize>
-            </TimeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/access.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
+			<maxFileSize>${LOG_FILE_MAX_SIZE:-50MB}</maxFileSize>
+			<maxHistory>${LOG_FILE_MAX_HISTORY:-180}</maxHistory>
+		</rollingPolicy>
 
         <encoder charset="UTF-8">
             <pattern>${DEF_PATTERN}</pattern>
@@ -81,13 +82,13 @@
 
     <appender name="trace" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${LOG_PATH}/trc.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <MaxHistory>180</MaxHistory>
-            <FileNamePattern>${LOG_PATH}/trc-%d{yyyy-MM-dd}_%i.log.zip</FileNamePattern>
-            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxFileSize>50MB</MaxFileSize>
-            </TimeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
+        
+          <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/trc.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
+			<maxFileSize>${LOG_FILE_MAX_SIZE:-50MB}</maxFileSize>
+			<maxHistory>${LOG_FILE_MAX_HISTORY:-180}</maxHistory>
+		</rollingPolicy>
+        
         <encoder charset="UTF-8">
             <pattern>${TRC_PATTERN}</pattern>
         </encoder>
