@@ -1,16 +1,16 @@
 package com.github.asinray.sec;
 
-import java.util.List;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * Cached authentication provider for conf server authentication.
@@ -63,7 +63,7 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
      * Check if the authentication should be authenticated.
      */
     private boolean isMatch(Authentication authentication){
-        return (authentication.getName().equals(INIT_ADMIN_NAME) && authentication.getCredentials().equals(INIT_ADMIN_NAME));
+        return (authentication.getName().equals(INIT_ADMIN_NAME) && authentication.getCredentials().equals(INIT_ADMIN_PSWD));
     }
 
      /**

@@ -2,7 +2,7 @@
 
 ## server SSL 访问的安全
 
-### 为Http Server生成SSK
+### 为Http Server生成SSL Key
 
 使用RSA加密，生成一个有效期为１年,别名为cnfsrv,密码为keypassAsin,存储密码为srv666的server.jks.
 
@@ -101,14 +101,17 @@ keytool -import　-trustcacerts -alias cnfsrv -file cnfsrv.cer -keystore $KS  -s
 
 ## 加密的安全
 
-这部分的安全可以配置在application.properties 文件中，也可以单独配置，为了表明config server也可以有自己的bootstrap.yml配置文件，我们将加密部分的安全配置在了这个文件中,配置的路径为classpath*:keystore.jks。
+这部分的安全可以配置在application.properties 文件中，也可以单独配置，为了表明config server也可以有自己的bootstrap.yml配置文件，我们将加密部分的安全配置在了这个文件中,配置的路径为classpath*:encrypt.conf-svc.jks。
 
 ```yml
 encrypt:
   fail-on-error: false
   key-store:
-    location: classpath*:keystore.jks
-    password: ${KEYSTORE_PASSWORD:foobar}
+    alias: asin
+    location: classpath*:encrypt.jks
+    password: ${KEYSTORE_PASSWORD:asinRay666}
+    # 可选参数,若配置必须和password一致
+    secret: asinRay666
 ```
 
 可以看到，我们使用了一个keystore.jks的文件来存储相关信息。
@@ -117,5 +120,5 @@ encrypt:
 
 ```sh
 #!/usr/bin/env bash
-keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.a.com,L=Beijing,S=Beijing,C=China" -keypass AsinRay -keystore conf-svc.jks -storepass asinRay
+keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.a.com,L=Beijing,S=Beijing,C=China" -keypass asinRay666 -keystore encrypt.jks -storepass asinRay666
 ```

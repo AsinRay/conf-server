@@ -15,17 +15,20 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Git repository filter invocation security meta data source.
+ * 
  * @author Asin Liu
  * @since 1.0.0
+ * @see org.springframework.security.access.SecurityMetadataSource
  */
 public class GitRepoUserFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
     private static final Logger log = LoggerFactory.getLogger(GitRepoUserFilterInvocationSecurityMetadataSource.class);
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-    public static final String ROLE_ROOT = "ROOT";
-    public static final String ROLE_USER = "USER";
+    public static final String ROLE_ROOT = "ROLE_ROOT";
+    public static final String ROLE_USER = "ROLE_USER";
 
     private static Map<String, String> urlRoleMap = new ConcurrentHashMap<String, String>() {
+        private static final long serialVersionUID = 1L;
         {
             put("/open/**", "ROLE_ANONYMOUS");
             put("/encrypt", ROLE_ROOT);
@@ -47,6 +50,8 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
      * empty collection if there are on applicable attributes.
      * @throws IllegalArgumentExecption if the passed object is not of a type supported by
      *                                  the <code>SecurityMetadataSource</code> implementation.
+     * 
+     * @see org.springframework.security.access.SecurityConfig
      */
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
@@ -59,7 +64,7 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
             }
         }
         //没有匹配到,默认是要登录才能访问
-        return SecurityConfig.createList(ROLE_USER);
+        return SecurityConfig.createList("ROLE_USER");
     }
 
     /**

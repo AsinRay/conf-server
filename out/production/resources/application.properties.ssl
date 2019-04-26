@@ -1,7 +1,5 @@
 spring.profiles.active=pro
 
-#server.http.port=9999
-
 server.port=8443
 server.ssl.enabled=true
 server.ssl.key-store=classpath:cnfsrv.p12

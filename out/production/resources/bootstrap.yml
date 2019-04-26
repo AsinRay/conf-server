@@ -4,5 +4,5 @@ spring:
 encrypt:
   fail-on-error: false
   key-store:
-    location: classpath*:keystore.jks
-    password: ${KEYSTORE_PASSWORD:foobar}
+    location: classpath*:encrypt.conf-svc.jks
+    password: ${KEYSTORE_PASSWORD:AsinRay}
