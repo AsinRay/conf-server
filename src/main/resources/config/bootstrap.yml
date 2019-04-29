@@ -1,6 +1,6 @@
 encrypt:
   key-store:
-    location: classpath:encrypt.jks
+    location: classpath:conf-svc3.jks
     alias: asin
-    password: ${KEYSTORE_PASSWORD:asinRay666}
-    secret: asinRay666
+    password: asin777777
+    secret: keypassAsin

@@ -109,8 +109,9 @@ encrypt:
   key-store:
     alias: asin
     location: classpath*:encrypt.jks
+    # 必选参数，keytools中的 -storepass
     password: ${KEYSTORE_PASSWORD:asinRay666}
-    # 可选参数,若配置必须和password一致
+    # 可选参数, keytools中的 -keypass 此参数在生成jks时会被忽略
     secret: asinRay666
 ```
 
@@ -122,3 +123,9 @@ encrypt:
 #!/usr/bin/env bash
 keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.a.com,L=Beijing,S=Beijing,C=China" -keypass asinRay666 -keystore encrypt.jks -storepass asinRay666
 ```
+
+Note:
+如果您使用的是jdk11的keytool生成的jks文件，在生成时会有如下警告
+Warning:  Different store and key passwords not supported for PKCS12 KeyStores. Ignoring user-specified -keypass value.
+那么请将-keypss 和 -storepass 设置成相同即可，在yml配置时也配置相同就行了。
+如果您想使用不同的-keypass和-storepass，请使用jdk8版本的keytool生成jks,然后将其应用于jdk11环境下,也可使用p12格式来实现。
