@@ -37,7 +37,8 @@ public class ConfAdmin {
     private static final int seed = 2;
     private static final int round = seed << seed;
 
-    private static Pattern TOKEN_PATTERN = Pattern.compile("^2a?[.0-9A-Za-z]{53}@$");
+    //private static Pattern TOKEN_PATTERN = Pattern.compile("^2a?[.0-9A-Za-z]{53}@$");
+    private static Pattern TOKEN_PATTERN = Pattern.compile("[0-9a-z]{32}:[$0-9A-Za-z.]{20,}@$");
     
     // Cached mappings (repo -> token)
     private static final ConcurrentHashMap<String, String> cachedRepoToken = new ConcurrentHashMap<>();
@@ -76,11 +77,11 @@ public class ConfAdmin {
     public String addRopeToken(@PathVariable("repo") String repo, @PathVariable("token") String token){
         String msg = "ok";
 
-        if(!TOKEN_PATTERN.matcher(token).matches()){
-            msg = "Token format is wrong. is it a boot-conf token?";
-            log.warn(msg);
-            return msg;
-        }
+        // if(!TOKEN_PATTERN.matcher(token).matches()){
+        //     msg = "Token format is wrong. is it a boot-conf token?";
+        //     log.warn(msg);
+        //     return msg;
+        // }
 
         String[] tk = token.split(":");
         if(tk.length != seed){

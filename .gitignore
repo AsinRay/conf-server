@@ -31,7 +31,7 @@ hs_err_pid*
 .project
 .classpath
 *.prefs
-.vscode/
-.gradle/
+.vscode
+.gradle
 bin/
 build/
