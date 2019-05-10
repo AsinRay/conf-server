@@ -1,5 +1,6 @@
 package com.github.asinray.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,7 +93,7 @@ public class ConfAdmin {
 
         try{
             String p = tk[1].substring(0,tk[1].length()-1);
-            addNewRepoToken(repo, token, p);
+            addNewRepoToken(repo, tk[0], p);
             setCacheRepoToken(repo, token);
         }catch(Exception e){
             msg = "Add repo token failed: ".concat(e.getMessage());
@@ -160,8 +161,14 @@ public class ConfAdmin {
         }
     }
 
+
     /**
-     * 
+     * Generate a security token.
+     * this token must be once and only once.
+     * the token separate to two parts, first part must be unique then followed by : and then
+     * followed by second part.
+     * @return
+     * @throws UnsupportedEncodingException
      */
     private String genSecToken() {
         String uuid = UUID.randomUUID().toString();
@@ -174,7 +181,7 @@ public class ConfAdmin {
                                 .append(encoder.encode(uid))
                                 .append("@").toString();
 
-            return token.replace("/", "").replace("\\$", "");
+            return token.replaceAll("/", "").replaceAll("\\$", "");
         }catch(Exception e){
             log.error(e.getMessage(), e);
         }
