@@ -1,0 +1,6 @@
+encrypt:
+  key-store:
+    location: classpath:encrypt.jks
+    alias: asin
+    password: asin777777
+    secret: keypassAsin

@@ -1,7 +1,8 @@
-package com.forotc.conf;
+package com.github.asinray;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.cloud.config.server.EnableConfigServer;
 
 
@@ -12,9 +13,9 @@ import org.springframework.cloud.config.server.EnableConfigServer;
  * @since 1.0.0
  */
 @EnableConfigServer
-@SpringBootApplication
-public class ConfigureServer {
+@SpringBootApplication(exclude ={SecurityAutoConfiguration.class} )
+public class Boot {
     public static void main(String[] args) {
-        SpringApplication.run(ConfigureServer.class, args);
+        SpringApplication.run(Boot.class, args);
     }
 }
