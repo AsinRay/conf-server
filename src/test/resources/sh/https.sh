@@ -38,8 +38,8 @@ curl --cacert cacert.pem  https://root:root@confserver.xxx.internal:8443/admin/p
 echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 
-# query the token of given app
-curl --cacert cacert.pem  https://root:toor@confserver.xxx.internal:8443/admin/ws/token
+# generate new token 
+curl --cacert cacert.pem  https://root:toor@confserver.xxx.internal:8443/admin/token
 echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 # add new token of given app
