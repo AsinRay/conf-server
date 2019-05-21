@@ -58,12 +58,39 @@ keytool -list -v -keystore client.p12 -storepass cli666
 
 ### 配置证书文件到 http server
 
+请参照resources/config/applicaton.properties文件
 
+```properites
 
+spring.profiles.active=pro
+server.port=8443
+server.ssl.enabled=true
+server.ssl.key-store=classpath:cnfsrv.p12
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store-password=srv666
+server.ssl.key-password=srv666
+server.ssl.key-alias=cnfsrv
+server.ssl.protocol=TLSv1.2
+server.use-forward-headers=true
+server.http2.enabled=true
+
+server.undertow.worker-threads=8
+server.undertow.buffer-size=1024
+server.undertow.direct-buffers=true
+server.undertow.io-threads=4
+
+management.endpoint.mappings.enabled=true
+management.endpoints.web.exposure.include=*
+management.server.port=8443
+management.server.servlet.context-path=/admin
+
+persistence.filepath=/user/
+
+```
 
 ### 导入证书到客户端JVM
 
-导入证书到客户端的JVM中，只需要将Server.jks导出成sever.cer证书，然后直接导入到JVM中。
+导入证书到客户端的JVM中，只需要将之前生成的cnfcli.p12导出成ca.cer证书，然后直接导入到JVM中。
 
 ```sh
 #!/usr/bin/env bash
@@ -77,9 +104,9 @@ KS=$JAVA_HOME/lib/security/cacerts
 keytool -list -keystore $KS -storepass changeit | grep cnfsrv
 
 
-keytool -export -v -alias cnfcli -keystore client.p12 -storetype PKCS12 -storepass cli666 -rfc -file client.cer
-keytool -import -noprompt -trustcacerts -alias cnfsrv -file cnfcli.cer -keystore $KS
-keytool -list -v -keystore $KS | grep cnfsrv
+keytool -export -v -alias cnfcli -keystore client.p12 -storetype PKCS12 -storepass cli666 -rfc -file ca.cer
+keytool -import -noprompt -trustcacerts -alias cnfsrv-ca -file ca.cer -keystore $KS
+keytool -list -v -keystore $KS | grep cnfsrv-ca
 ```
 
 ### 更新导入JVM的证书
