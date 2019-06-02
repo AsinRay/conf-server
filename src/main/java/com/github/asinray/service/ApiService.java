@@ -2,14 +2,14 @@ package com.github.asinray.service;
 
 import java.lang.reflect.Field;
 import java.security.SecureRandom;
+import java.util.Map;
+import java.util.List;
+import java.util.UUID;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -64,7 +64,10 @@ public class ApiService {
             UserDetails ud = inMemoryUserDetailsManager.loadUserByUsername(userName);
             if(ud != null && ud.getPassword().equals(oldPassword)){
                 inMemoryUserDetailsManager.updatePassword(ud, newPassword);
-                MemPersistenceService.updateUsers(extractPersistenceUsers(inMemoryUserDetailsManager), USER_STORE_FILE);
+                MemPersistenceService.updateUsers(
+                    extractPersistenceUsers(inMemoryUserDetailsManager),
+                    MemPersistenceService.USER_STORE_FILE
+                );
                 return true;
             }
         } catch (Exception e) {
@@ -202,7 +205,10 @@ public class ApiService {
         SimpleGrantedAuthority sga = new SimpleGrantedAuthority(r);
         Collection<? extends GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(){{add(sga);}};
         inMemoryUserDetailsManager.createUser(new User(user, password,authorities));
-        MemPersistenceService.updateUsers(extractPersistenceUsers(inMemoryUserDetailsManager),USER_STORE_FILE);
+        MemPersistenceService.updateUsers(
+            extractPersistenceUsers(inMemoryUserDetailsManager),
+            MemPersistenceService.USER_STORE_FILE
+            );
         GitRepoUserFilterInvocationSecurityMetadataSource.addMatcher(url,r);
     }
 

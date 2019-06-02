@@ -76,7 +76,6 @@ public class WebSecurityConfAdapter extends WebSecurityConfigurerAdapter {
                         return fsi;
                     }
                 })
-                .and().httpBasic()
-        ;
+                .and().httpBasic();
     }
 }
