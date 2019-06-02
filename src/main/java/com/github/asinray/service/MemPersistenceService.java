@@ -29,6 +29,13 @@ import  org.springframework.security.core.userdetails.UserDetails;
 public interface MemPersistenceService extends Persistencer{
 
     static final Logger log = LoggerFactory.getLogger(MemPersistenceService.class);
+
+    public static final String USER_HOME = System.getProperty("user.home");
+    public static final String DEF_SEC_PATH = USER_HOME.concat("/.sec/");
+    public static final String USER_STORE_FILE = DEF_SEC_PATH.concat(".udl");
+    public static final String APP_TOKEN_STORE_FILE = DEF_SEC_PATH.concat(".atm");
+    public static final String ANT_MATCHER_STORE_FILE = DEF_SEC_PATH.concat(".am");
+
    
     public static List<User> loadUsers(String filePath){
         return loadFromFile(filePath);

@@ -35,12 +35,7 @@ public class ApiService {
 
     private static final Logger log = LoggerFactory.getLogger(ApiService.class);
 
-    public static final String USER_HOME = System.getProperty("user.home");
-    public static final String DEF_SEC_PATH = USER_HOME.concat("/.sec/");
-    public static final String USER_STORE_FILE = DEF_SEC_PATH.concat(".udl");
-    public static final String APP_TOKEN_STORE_FILE = DEF_SEC_PATH.concat(".atm");
-    public static final String ANT_MATCHER_STORE_FILE = DEF_SEC_PATH.concat(".am");
-
+   
 
     private ConcurrentHashMap<String, String> repoTokenMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, String> matcherRoleMap = new ConcurrentHashMap<>();
