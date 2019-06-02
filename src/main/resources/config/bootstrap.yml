@@ -4,3 +4,6 @@ encrypt:
     alias: asin
     password: asin777777
     secret: keypassAsin
+spring:
+  application:
+    name: conf-server

@@ -44,7 +44,7 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
 
 
     public GitRepoUserFilterInvocationSecurityMetadataSource(){
-        Map<String, String> map = MemPersistenceService.loadAntMatchers(ApiService.ANT_MATCHER_STORE_FILE);
+        Map<String, String> map = MemPersistenceService.loadAntMatchers(MemPersistenceService.ANT_MATCHER_STORE_FILE);
         if(map != null){
             urlRoleMap.clear();
             urlRoleMap.putAll(map);
@@ -61,7 +61,7 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
     public static void addMatcher(String url, String role) {
         urlRoleMap.put(url, role);
         log.info("Add matcher : {},{}",url,role);
-        MemPersistenceService.updateAntMatchers(urlRoleMap, ApiService.ANT_MATCHER_STORE_FILE);
+        MemPersistenceService.updateAntMatchers(urlRoleMap, MemPersistenceService.ANT_MATCHER_STORE_FILE);
     }
 
 
@@ -79,7 +79,7 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
             }
         }
         log.info("remove matcher : {}",auth0);
-        MemPersistenceService.updateAntMatchers(urlRoleMap, ApiService.ANT_MATCHER_STORE_FILE);
+        MemPersistenceService.updateAntMatchers(urlRoleMap, MemPersistenceService.ANT_MATCHER_STORE_FILE);
     }
 
 
