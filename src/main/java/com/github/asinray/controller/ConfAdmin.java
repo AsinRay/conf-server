@@ -1,15 +1,6 @@
 package com.github.asinray.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
-
 import com.github.asinray.service.ApiService;
-import com.github.asinray.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
