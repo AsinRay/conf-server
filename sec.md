@@ -4,17 +4,20 @@
 
 ### 为Http Server生成SSL Key
 
-Note: 生成jks或者p12格式的证书存储时请注意其中的O=confserver.xxx.internal这个参数需要设置为客户端请求的host。
+Note: 
+
+生成jks或者p12格式的证书存储时请注意其中的O=confserver.bittx.net这个参数需要设置为客户端请求的host。
+在测试时请将confserver.bittx.net 解析到您的服务启动的ip。
 
 ```sh
 #!/usr/bin/env bash
 
 # 生成jks格式
 # 使用RSA加密，生成一个有效期为１年,别名为cnfsrv,密码为keypassAsin,存储密码为srv666的server.jks.
-keytool -validity 365 -genkey -v -alias cnfsrv -keyalg RSA -keystore server.jks -keypass keypassAsin  -storepass srv666 -dname "CN=Web Server,OU=China,O=confserver.xxx.internal,L=Beijing,S=Beijing,C=China"
+keytool -validity 365 -genkey -v -alias cnfsrv -keyalg RSA -keystore server.jks -keypass keypassAsin  -storepass srv666 -dname "CN=Web Server,OU=China,O=confserver.bittx.net,L=Beijing,S=Beijing,C=China"
 
 # 生成p12格式
-keytool -genkeypair -alias cnfsrv -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore cnfsrv.p12 -validity 3650 -keypass srv666 -storepass srv666 -dname "CN=confserver.xxx.internal,OU=China,O=confserver.xxx.internal,L=Beijing,S=Beijing,C=China"
+keytool -genkeypair -alias cnfsrv -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore cnfsrv.p12 -validity 3650 -keypass srv666 -storepass srv666 -dname "CN=confserver.bittx.net,OU=China,O=confserver.bittx.net,L=Beijing,S=Beijing,C=China"
 
 # 导出证书
 keytool -export -alias cnfsrv -file cnfsrv.cer -keystore cnfsrv.p12 -storepass srv666
@@ -22,10 +25,10 @@ keytool -export -alias cnfsrv -file cnfsrv.cer -keystore cnfsrv.p12 -storepass s
 
 ### 生成客户端证书
 
-生成客户端证书时，keytool参数O=client.xxx.internal 没有强制性要求。
+生成客户端证书时，keytool参数O=client.bittx.net 没有强制性要求。
 
 ```sh
-keytool -validity 365 -genkeypair -v -alias cnfcli -keyalg RSA -storetype PKCS12 -keystore client.p12 -keypass cli666  -storepass cli666 -dname "CN=client,OU=China,O=client.xxx.internal,L=Beijing,S=Beijing,C=China"
+keytool -validity 365 -genkeypair -v -alias cnfcli -keyalg RSA -storetype PKCS12 -keystore client.p12 -keypass cli666  -storepass cli666 -dname "CN=client,OU=China,O=client.bittx.net,L=Beijing,S=Beijing,C=China"
 ```
 
 ### 客户端证书加入到服务器证书信任
@@ -156,7 +159,7 @@ encrypt:
 
 ```sh
 #!/usr/bin/env bash
-keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.a.com,L=Beijing,S=Beijing,C=China" -keypass asinRay666 -keystore encrypt.jks -storepass asinRay666
+keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.bittx.net,L=Beijing,S=Beijing,C=China" -keypass asinRay666 -keystore encrypt.jks -storepass asinRay666
 ```
 
 Note:

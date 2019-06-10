@@ -1,11 +1,26 @@
 package com.github.asinray.controller;
 
-import com.github.asinray.service.ApiService;
+import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
+import com.github.asinray.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
+
+import com.github.asinray.service.ApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +49,7 @@ public class ConfAdmin {
      * @param oldpass   old password of root
      * @param newpass   new password to be reset to root.
      */
-    
+
     @RequestMapping("pass/{oldpass}/{newpass}")
     public boolean updateRootPassword(@PathVariable("oldpass") String oldpass, @PathVariable("newpass") String newpass) {
         return apiService.updatePassword("root", oldpass, newpass);
@@ -47,7 +62,7 @@ public class ConfAdmin {
     public String genNewToken(){
         return apiService.genSecToken();
     }
-    
+
     /**
      * Assign token to specified repo.
      * @param repo
@@ -71,33 +86,17 @@ public class ConfAdmin {
 
      /**
      * Delete the repo and token.
-     * @param repo  repostory
+     * @param repo  repository
      */
     @RequestMapping("{repo}/del")
     public boolean removeRepoToken(@PathVariable("repo") String repo){
         return apiService.removeRepoToken(repo);
     }
 
-    
 
-    // /**
-    //  * Cache the repo's token, for query only.
-    //  * this method should call after the method {@link #addNewRepoToken(String repo, String user, String password)}
-    //  * @param repo  repository.
-    //  * @param token token of the repository.
-    //  */
-    // private void setCacheRepoToken(String repo,String token){
-    //     String rst = cachedRepoToken.putIfAbsent(repo, token);
-    //     if(rst != null){
-    //         log.warn("The token is already exist in the cache map.");
-    //     }
-    // }
-    
-  
-    /**
-     * Check if the string has text.
-     */
-    private boolean hasText(String text){
-        return StringUtils.hasText(text);
+    @RequestMapping("{repo}/exist")
+    public boolean repoExist(@PathVariable("repo") String repo){
+        return apiService.repoExists(repo);
     }
+
 }

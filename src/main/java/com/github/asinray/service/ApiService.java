@@ -1,20 +1,6 @@
 package com.github.asinray.service;
 
-import java.lang.reflect.Field;
-import java.security.SecureRandom;
-import java.util.Map;
-import java.util.List;
-import java.util.UUID;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.regex.Pattern;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.Resource;
-
 import com.github.asinray.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,6 +12,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
+import java.lang.reflect.Field;
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+
 /**
  * ApiService for admin controller.
  */
@@ -35,12 +28,12 @@ public class ApiService {
 
     private static final Logger log = LoggerFactory.getLogger(ApiService.class);
 
-   
+    private static final String AUTH0 = "auth0";
+    private static final String AUTH1 = "auth1";
 
-    private ConcurrentHashMap<String, String> repoTokenMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, String> matcherRoleMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, String> repoTokenMap = new ConcurrentHashMap<>();
 
-    private static Pattern TOKEN_PATTERN = Pattern.compile("^2a?[.0-9A-Za-z]{53}@$");
+    public static Pattern TOKEN_PATTERN = Pattern.compile("^[0-9A-Za-z]{32}:2a08?[.0-9A-Za-z]{52,53}@$");
 
     private static final int seed = 2;
     private static final int round = seed << seed;
@@ -64,10 +57,7 @@ public class ApiService {
             UserDetails ud = inMemoryUserDetailsManager.loadUserByUsername(userName);
             if(ud != null && ud.getPassword().equals(oldPassword)){
                 inMemoryUserDetailsManager.updatePassword(ud, newPassword);
-                MemPersistenceService.updateUsers(
-                    extractPersistenceUsers(inMemoryUserDetailsManager),
-                    MemPersistenceService.USER_STORE_FILE
-                );
+                MemPersistenceService.updateUsers(extractPersistenceUsers(inMemoryUserDetailsManager));
                 return true;
             }
         } catch (Exception e) {
@@ -76,7 +66,7 @@ public class ApiService {
         }
         return false;
     }
-     
+
 
     /**
      * Generate a security token.
@@ -84,7 +74,6 @@ public class ApiService {
      * the token separate to two parts, first part must be unique then followed by : and then
      * followed by second part.
      * @return
-     * @throws UnsupportedEncodingException
      */
     public String genSecToken(){
         try {
@@ -106,12 +95,12 @@ public class ApiService {
 
     /**
      * Extract user from InMemoryUserDetailsManager
-     * 
+     *
      * @param inMemoryUserDetailsManager
      * @return
      */
     public static List<User> extractPersistenceUsers(InMemoryUserDetailsManager inMemoryUserDetailsManager){
-        List<User> userList = null;
+        List<User> userList = new ArrayList<>();
 
         try{
             Field field = InMemoryUserDetailsManager.class.getDeclaredField("users");
@@ -130,7 +119,7 @@ public class ApiService {
             }).collect(Collectors.toList());
             */
         }catch(NoSuchFieldException noSuchFieldError) {
-            // TODO: 
+            // TODO:
             log.error("No such field error:",noSuchFieldError);
         }catch(IllegalAccessException iae){
             log.error("IllegalArgumentException:", iae);
@@ -140,22 +129,21 @@ public class ApiService {
 
     /**
      * Check if the token is exists.
-     * 
+     *
      * @return
      */
     public boolean repoExists(String repo) {
-        String token = repoTokenMap.get(repo);
-        return TOKEN_PATTERN.matcher(token).matches() ;
+        return repoTokenMap.keySet().contains(repo);
     }
 
     /**
      * Add new repo token to conf server.
-     * 
-     * Step: 
-     * 1. Add repo -> token mapping. 
-     * 2. Add ant matcher -> role mapping. 
+     *
+     * Step:
+     * 1. Add repo -> token mapping.
+     * 2. Add ant matcher -> role mapping.
      * 3. Add user to InMemoryUserDetailsManager.
-     * 
+     *
      *
      * @param repo      repo to be added.
      * @param token     repo's token
@@ -164,52 +152,48 @@ public class ApiService {
     public boolean addRepoToken(String repo,String token){
 
         String msg = "ok";
-        /* if (!token.equals(newestToken)) {
-            msg = "Token is expired, please renew a new one.";
-            return msg;
-        }*/
-
-       /* if (!TOKEN_PATTERN.matcher(token).matches()) {
-            msg = "Token does not look like a boot2-conf token";
-            logger.warn(msg);
-            return msg;
-        }*/
-
-        String[] tk = token.split(":");
-        if (tk.length != seed){
-            msg = "Failed to bind token, token has wrong format.";
-            log.error(msg);
+        if (!hasText(repo) || !hasText(token)) {
+            log.warn("Reop and token must not be null");
             return false;
         }
-        String p = tk[1].substring(0, tk[1].length() - 1);
+
+       if (!TOKEN_PATTERN.matcher(token).matches()) {
+            log.warn("Token does not look like a boot2-conf token");
+            return false;
+        }
+
+
         //TODO: if the keys contains repo, return;
-        repoTokenMap.put(repo, token);
-        addUserRepo(repo,tk[0],p);
+        addRepoTokenMapping(repo,token);     // step : 01
+
+        Map<String,String> map = parseToken(token);
+        String user = map.get(AUTH0);
+        String pass = map.get(AUTH1);
+
+        addUser(user,pass);                   // step : 02
+
+        String url = "/".concat(repo).concat("/**");
+        String r = "ROLE_".concat(user);
+        GitRepoUserFilterInvocationSecurityMetadataSource.addMatcher(url,r);    // step : 3
         return true;
     }
 
     /**
      * Add a new repo with given user and password.
-     * @param repo      repo to be added.
      * @param user      repo's username     if the username has added to memory, an exception will throw,
      *                  see  {org.springframework.security.provisioning#createUser()}
      * @param password  repo's password
      *
      */
-    private void addUserRepo(String repo,String user,String password) {
-        if (!StringUtils.hasText(repo) || !StringUtils.hasText(user) || !StringUtils.hasText(password)) {
-            throw new IllegalArgumentException("repo, username and password must not be null.");
+    private void addUser(String user,String password) {
+        if (!hasText(user) || !hasText(password)) {
+            throw new IllegalArgumentException("username and password must not be null.");
         }
         String r = "ROLE_".concat(user);
-        String url = "/".concat(repo).concat("/**");
         SimpleGrantedAuthority sga = new SimpleGrantedAuthority(r);
         Collection<? extends GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(){{add(sga);}};
         inMemoryUserDetailsManager.createUser(new User(user, password,authorities));
-        MemPersistenceService.updateUsers(
-            extractPersistenceUsers(inMemoryUserDetailsManager),
-            MemPersistenceService.USER_STORE_FILE
-            );
-        GitRepoUserFilterInvocationSecurityMetadataSource.addMatcher(url,r);
+        MemPersistenceService.updateUsers(extractPersistenceUsers(inMemoryUserDetailsManager));
     }
 
 
@@ -220,15 +204,30 @@ public class ApiService {
         return repoTokenMap.get(repo);
     }
 
+    private void addRepoTokenMapping(String repo,String token){
+        repoTokenMap.put(repo, token);
+        MemPersistenceService.updateRepoTokenMap(repoTokenMap);
+    }
+
+    private void removeRepoTokenMapping(String repo){
+        repoTokenMap.remove(repo);
+        MemPersistenceService.updateRepoTokenMap(repoTokenMap);
+    }
+
     /**
      * Remove specified repo -> token mapping.
-     * 
-     * 
+     *
+     *
      * @param repo
      */
     public boolean removeRepoToken(String repo) {
         try {
-            repoTokenMap.remove(repo);
+            String token = repoTokenMap.get(repo);
+            String auth0 = parseToken(token).get(AUTH0);
+
+            inMemoryUserDetailsManager.deleteUser(auth0);       // step : 1
+            GitRepoUserFilterInvocationSecurityMetadataSource.removeMatcher(auth0); // step : 2
+            removeRepoTokenMapping(repo);   // step : 3
         } catch (Exception e) {
             //TODO: handle exception
             log.error("Remove token failed. msg: {}", e.getMessage(), e);
@@ -247,7 +246,7 @@ public class ApiService {
         if(token != null && token.trim().length()>0) {
             boolean match =  TOKEN_PATTERN.matcher(token).matches() ;
             if(!match){
-                throw new IllegalArgumentException("token must be matcher with:" + TOKEN_PATTERN.pattern());
+                throw new IllegalArgumentException("Token must be matcher with:" + TOKEN_PATTERN.pattern());
             }
 
             String[] tk = token.split(":");
@@ -255,11 +254,38 @@ public class ApiService {
             String auth0 = tk[0];
             String auth1 = tk[1].substring(0,tk[1].length()-1);
 
-            mp.put("auth0", auth0);
-            mp.put("auth1",auth1);
+            mp.put(AUTH0, auth0);
+            mp.put(AUTH1,auth1);
 
         }
         return mp;
     }
 
+
+    /**
+     * Get all keys which has the value of specified object.
+     * @param <K>   the key
+     * @param <V>
+     * @param map   map to be parse
+     * @param value specified value.
+     * @return      a list which contains all keys with the specified value.
+     */
+    public static <K,V> List<K> getMapKeyViaValue(Map<K,V> map ,V value){
+
+        List<K> valueList = new ArrayList<K>();
+        for (K k : map.keySet()) {
+            if(value.equals(map.get(k))){
+                valueList.add(k);
+            }
+        }
+        return valueList;
+    }
+
+
+    /**
+     * Check if the string has text.
+     */
+    private boolean hasText(String text){
+        return StringUtils.hasText(text);
+    }
 }

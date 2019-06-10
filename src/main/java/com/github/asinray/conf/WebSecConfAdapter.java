@@ -10,19 +10,23 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
-
 /**
+ * 
+ * AdminWebSecurityConfigurationAdapter
+ * 
  * Web security configuration for ot.
+
  * <p>
  * Multiple HttpSecurity instances config:
  * <code>
  *
- * @Order(1) public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
- * protected void configure(HttpSecurity http) throws Exception {
- * http.antMatcher("/open/**")
- * .authorizeRequests()
- * .antMatchers().permitAll();
- * }
+ * @Order(1) 
+ * public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+ *      protected void configure(HttpSecurity http) throws Exception {
+ *          http.antMatcher("/open/**")
+ *          .authorizeRequests()
+ *          .antMatchers().permitAll();
+ *      }
  * }
  * </code>
  * <p>
@@ -55,16 +59,18 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 
 @EnableWebSecurity
 @Order(1)
-public class WebSecurityConfAdapter extends WebSecurityConfigurerAdapter {
+public class WebSecConfAdapter extends WebSecurityConfigurerAdapter {
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // super.configure(http);
         http.formLogin().disable();
         http.csrf().disable();
-        http.antMatcher("/**").authorizeRequests()
-                .anyRequest().authenticated()
-                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>(){
+        http.antMatcher("/**").authorizeRequests().anyRequest().authenticated().withObjectPostProcessor(
+            new ObjectPostProcessor<FilterSecurityInterceptor>() {
                     /**
-                     * Initialize the object possibly returning a modified instance that should be used
-                     * instead.
+                     * Initialize the object possibly returning a modified instance that should be
+                     * used instead.
                      *
                      * @param fsi the object to initialize
                      * @return the initialized version of the object
@@ -75,7 +81,7 @@ public class WebSecurityConfAdapter extends WebSecurityConfigurerAdapter {
                         fsi.setAccessDecisionManager(new GitRepoUserAccessDecisionManager());
                         return fsi;
                     }
-                })
-                .and().httpBasic();
+            }).and().httpBasic();
     }
+    
 }

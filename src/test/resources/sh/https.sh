@@ -8,7 +8,7 @@
 echo quit | openssl s_client -showcerts -servername confserver.xxx.internal -connect confserver.xxx.internal:8443 > cacert.pem
 
 # query the encrypt status
-curl --cacert cacert.pem https://root:toor@confserver.xxx.internal:8443/admin/user/exists/sta
+curl --cacert cacert.pem https://root:toor@confserver.xxx.internal:8443/admin/myApp/exist
 
 echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 

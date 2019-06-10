@@ -1,27 +1,23 @@
 package com.github.asinray.conf;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.annotation.Resource;
-
 import com.github.asinray.sec.CachedAuthenticationProvider;
 import com.github.asinray.service.MemPersistenceService;
-
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Web security conf
@@ -41,6 +37,11 @@ public class WebSecurityConf {
         add( ub.username("root").password("toor").roles("ROOT").build());
     }};
 
+
+    /**
+     * Other password encoder ?
+     * @return
+     */
     @Bean
     PasswordEncoder passwordEncoder(){
         return new PasswordEncoder(){
@@ -60,7 +61,7 @@ public class WebSecurityConf {
 
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        List<User> ul = (List<User>) MemPersistenceService.loadUsers(MemPersistenceService.USER_STORE_FILE);
+        List<User> ul = MemPersistenceService.loadUsers(MemPersistenceService.USER_STORE_FILE);
         if (ul == null || ul.isEmpty()) {
             return new InMemoryUserDetailsManager(udl);
         }
@@ -82,7 +83,7 @@ public class WebSecurityConf {
         return daoAuthenticationProvider;
     }
 
-    @Bean 
+    @Bean
     public CachedAuthenticationProvider cachedAuthenticationProvider(){
         return new CachedAuthenticationProvider();
     }
@@ -91,7 +92,7 @@ public class WebSecurityConf {
      * 不擦除认证密码，
      * 擦除会导致TokenBasedRememberMeServices因为找不到Credentials再调用UserDetailsService
      * 而抛出UsernameNotFoundException
-     * 
+     *
      * @return
      */
     @Bean

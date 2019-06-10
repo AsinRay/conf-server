@@ -16,7 +16,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  * Cached authentication provider for conf server authentication.
  * 
  * @author Asin Liu
- * @param <GrantedAuthority>
  */
 public class CachedAuthenticationProvider implements AuthenticationProvider {
 
@@ -49,7 +48,10 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
     @Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         // if(isMatch(authentication)){
-        //     User user  = new User(authentication.getName(),authentication.getPrincipal().toString(),authorities.stream().collect());
+        //     User user  = new User(authentication.getName(),
+        //      authentication.getPrincipal().toString(),
+        //      authorities.stream().collect());
+
         //     return new UsernamePasswordAuthenticationToken(user,authentication.getCredentials(),authorities);
         // }
         if(isMatch(authentication)){
@@ -63,7 +65,8 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
      * Check if the authentication should be authenticated.
      */
     private boolean isMatch(Authentication authentication){
-        return (authentication.getName().equals(INIT_ADMIN_NAME) && authentication.getCredentials().equals(INIT_ADMIN_PSWD));
+        return authentication.getName().equals(INIT_ADMIN_NAME)
+                && authentication.getCredentials().equals(INIT_ADMIN_PSWD);
     }
 
      /**

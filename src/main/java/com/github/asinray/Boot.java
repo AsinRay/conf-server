@@ -30,11 +30,11 @@ public class Boot {
         String contextPath = environment.getProperty("server.servlet.context-path");
         String jdbcURL = environment.getProperty("datasouce.url");
         String jdbcUser = environment.getProperty("username");
-        log.info("appName = " + appName);
+        log.info("app.name = " + appName);
         log.info("server.port = " + port);
         log.info("contextPath = " + contextPath);
-        log.info("jdbcURL = " + jdbcURL );
-        log.info("jdbcUser = " + jdbcUser);
+        log.info("jdbc.url = " + jdbcURL );
+        log.info("jdbc.user = " + jdbcUser);
         log.info("hello = " + environment.getProperty("hello"));
 
         log.info("http://localhost:" + port + contextPath + "/hello?name=");
