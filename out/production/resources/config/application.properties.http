@@ -1,0 +1,5 @@
+server.port=9999
+management.server.port=9999
+management.endpoint.mappings.enabled=true
+management.endpoints.web.exposure.include=*
+management.server.servlet.context-path=/admin

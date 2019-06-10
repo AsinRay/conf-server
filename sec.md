@@ -19,8 +19,8 @@ keytool -validity 365 -genkey -v -alias cnfsrv -keyalg RSA -keystore server.jks 
 # 生成p12格式
 keytool -genkeypair -alias cnfsrv -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore cnfsrv.p12 -validity 3650 -keypass srv666 -storepass srv666 -dname "CN=confserver.bittx.net,OU=China,O=confserver.bittx.net,L=Beijing,S=Beijing,C=China"
 
-# 导出证书
-keytool -export -alias cnfsrv -file cnfsrv.cer -keystore cnfsrv.p12 -storepass srv666
+# 导出证书备用(可选)
+keytool -export -v -alias cnfsrv -keystore cnfsrv.p12 -storepass srv666 -rfc -file cnfsrv.cer
 ```
 
 ### 生成客户端证书
@@ -37,6 +37,7 @@ keytool -validity 365 -genkeypair -v -alias cnfcli -keyalg RSA -storetype PKCS12
 我们必须先把客户端证书导出为一个单独的CER格式的文件，使用如下命令:
 
 ```sh
+# 将server的.cer格式的证书导入到cnfsrv.p12中
 keytool -export -v -alias cnfcli -keystore client.p12 -storetype PKCS12 -storepass cli666 -rfc -file cnfcli.cer
 keytool -import -v -alias cnfcli -file cnfcli.cer -keystore cnfsrv.p12 -storepass srv666 -noprompt
 ```
@@ -44,6 +45,7 @@ keytool -import -v -alias cnfcli -file cnfcli.cer -keystore cnfsrv.p12 -storepas
 ### 服务器证书加入客户端信任
 
 ```sh
+# 将client的.cer格式的证书导入到client.p12中
 keytool -export -v -alias cnfsrv -keystore cnfsrv.p12 -storepass srv666 -rfc -file cnfsrv.cer
 keytool -import -v -alias cnfsrv -file cnfsrv.cer -keystore client.p12 -storepass cli666 -noprompt
 ```
@@ -53,7 +55,7 @@ keytool -import -v -alias cnfsrv -file cnfsrv.cer -keystore client.p12 -storepas
 ```sh
 # 删除中间生成的cer文件
 rm *.cer
-# 查看一下client的证书是否正确的导入server.jks
+# 查看一下client的证书是否正确的导入cnfsrv.p12
 keytool -list -v -keystore cnfsrv.p12 -storepass srv666
 # 检查server的证书是否正确地导入到client.p12中
 keytool -list -v -keystore client.p12 -storepass cli666
