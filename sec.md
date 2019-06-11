@@ -95,7 +95,7 @@ persistence.filepath=/user/
 
 ### 导入证书到客户端JVM
 
-导入证书到客户端的JVM中，只需要将之前生成的cnfcli.p12导出成ca.cer证书，然后直接导入到JVM中。
+导入证书到客户端的JVM中，只需要将之前生成的cnfsrv.p12导出成ca.cer证书，然后直接导入到JVM中。
 
 ```sh
 #!/usr/bin/env bash
@@ -106,10 +106,8 @@ KS=$JAVA_HOME/jre/lib/security/cacerts
 #jdk 11
 KS=$JAVA_HOME/lib/security/cacerts
 
-keytool -list -keystore $KS -storepass changeit | grep cnfsrv
-
-
-keytool -export -v -alias cnfcli -keystore client.p12 -storetype PKCS12 -storepass cli666 -rfc -file ca.cer
+keytool -list -keystore $KS -storepass changeit | grep cnfsrv-ca
+keytool -export -v -alias cnfsrv -keystore cnfsrv.p12 -storepass srv666 -storetype PKCS12 -rfc -file ca.cer
 keytool -import -noprompt -trustcacerts -alias cnfsrv-ca -file ca.cer -keystore $KS
 keytool -list -v -keystore $KS | grep cnfsrv-ca
 ```
@@ -132,6 +130,7 @@ KS=$JAVA_HOME/lib/security/cacerts
 keytool -list -keystore $KS -storepass changeit | grep cnfsrv
 
 # 删除cacerts中指定名称的证书(需要root权限)
+KS=$JAVA_HOME/lib/security/cacerts
 sudo keytool -delete -alias cnfsrv -keystore $KS  -storepass changeit
 
 # 导入指定证书到cacerts：
