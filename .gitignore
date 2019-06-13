@@ -37,3 +37,5 @@ hs_err_pid*
 .gradle
 bin/
 build/
+.attach_pid*
+start.html
