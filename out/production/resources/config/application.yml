@@ -1,9 +1,0 @@
-spring:
-  cloud:
-    config:
-      server:
-        git:
-          #uri: https://
-          # uri conf for native git.
-          uri: ${HOME}/conf-repo
-          basedir: target/config

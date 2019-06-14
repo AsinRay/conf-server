@@ -1,6 +1,0 @@
-encrypt:
-  key-store:
-    location: classpath:encrypt.jks
-    alias: asin
-    password: ${KEYSTORE_PASSWORD:asinRay666}
-    secret: asinRay666
