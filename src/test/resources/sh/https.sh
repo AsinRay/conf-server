@@ -8,7 +8,7 @@
 echo quit | openssl s_client -showcerts -servername confserver.xxx.internal -connect confserver.xxx.internal:8443 > cacert.pem
 
 # query the encrypt status
-curl --cacert cacert.pem https://root:toor@confserver.xxx.internal:8443/admin/user/exists/sta
+curl --cacert cacert.pem https://root:toor@confserver.xxx.internal:8443/admin/myApp/exist
 
 echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
@@ -38,8 +38,8 @@ curl --cacert cacert.pem  https://root:root@confserver.xxx.internal:8443/admin/p
 echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 
-# query the token of given app
-curl --cacert cacert.pem  https://root:toor@confserver.xxx.internal:8443/admin/ws/token
+# generate new token 
+curl --cacert cacert.pem  https://root:toor@confserver.xxx.internal:8443/admin/token
 echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 # add new token of given app

@@ -1,17 +1,21 @@
 package com.github.asinray.sec;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.github.asinray.service.MemPersistenceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.util.AntPathMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.github.asinray.service.MemPersistenceService.ANT_MATCHER_STORE_FILE;
 
 /**
  * Git repository filter invocation security meta data source.
@@ -38,10 +42,47 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
         }
     };
 
+
+    public GitRepoUserFilterInvocationSecurityMetadataSource(){
+        Map<String, String> map = MemPersistenceService.loadAntMatchers(ANT_MATCHER_STORE_FILE);
+        if(map != null){
+            urlRoleMap.clear();
+            urlRoleMap.putAll(map);
+        }
+    }
+
+    /**
+     * Add new matcher and persistent to file.
+     *
+     * Persistent 3 !!!
+     * @param url
+     * @param role
+     */
     public static void addMatcher(String url, String role) {
         urlRoleMap.put(url, role);
-        log.info("Add matcher: {} {}", url, role);
+        log.info("Add matcher : {},{}",url,role);
+        MemPersistenceService.updateAntMatchers(urlRoleMap);
     }
+
+
+    /**
+     * Remove ant matcher and re-persistent to file.
+     * @param auth0
+     */
+    public static void removeMatcher(String auth0) {
+        String role = "ROLE_".concat(auth0);
+        Set<String> keys = urlRoleMap.keySet();
+
+        for (String s : keys) {
+            if(urlRoleMap.get(s).equals(role)){
+                urlRoleMap.remove(s);
+            }
+        }
+        log.info("remove matcher : {}",auth0);
+        MemPersistenceService.updateAntMatchers(urlRoleMap);
+    }
+
+
 
     /**
      * Accesses the {@code ConfigAttribute}s that apply to a given secure object.

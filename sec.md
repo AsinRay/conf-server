@@ -4,28 +4,31 @@
 
 ### 为Http Server生成SSL Key
 
-Note: 生成jks或者p12格式的证书存储时请注意其中的O=confserver.xxx.internal这个参数需要设置为客户端请求的host。
+Note: 
+
+生成jks或者p12格式的证书存储时请注意其中的O=confserver.bittx.net这个参数需要设置为客户端请求的host。
+在测试时请将confserver.bittx.net 解析到您的服务启动的ip。
 
 ```sh
 #!/usr/bin/env bash
 
 # 生成jks格式
 # 使用RSA加密，生成一个有效期为１年,别名为cnfsrv,密码为keypassAsin,存储密码为srv666的server.jks.
-keytool -validity 365 -genkey -v -alias cnfsrv -keyalg RSA -keystore server.jks -keypass keypassAsin  -storepass srv666 -dname "CN=Web Server,OU=China,O=confserver.xxx.internal,L=Beijing,S=Beijing,C=China"
+keytool -validity 365 -genkey -v -alias cnfsrv -keyalg RSA -keystore server.jks -keypass keypassAsin  -storepass srv666 -dname "CN=Web Server,OU=China,O=confserver.bittx.net,L=Beijing,S=Beijing,C=China"
 
 # 生成p12格式
-keytool -genkeypair -alias cnfsrv -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore cnfsrv.p12 -validity 3650 -keypass srv666 -storepass srv666 -dname "CN=confserver.xxx.internal,OU=China,O=confserver.xxx.internal,L=Beijing,S=Beijing,C=China"
+keytool -genkeypair -alias cnfsrv -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore cnfsrv.p12 -validity 3650 -keypass srv666 -storepass srv666 -dname "CN=confserver.bittx.net,OU=China,O=confserver.bittx.net,L=Beijing,S=Beijing,C=China"
 
-# 导出证书
-keytool -export -alias cnfsrv -file cnfsrv.cer -keystore cnfsrv.p12 -storepass srv666
+# 导出证书备用(可选)
+keytool -export -v -alias cnfsrv -keystore cnfsrv.p12 -storepass srv666 -rfc -file cnfsrv.cer
 ```
 
 ### 生成客户端证书
 
-生成客户端证书时，keytool参数O=client.xxx.internal 没有强制性要求。
+生成客户端证书时，keytool参数O=client.bittx.net 没有强制性要求。
 
 ```sh
-keytool -validity 365 -genkeypair -v -alias cnfcli -keyalg RSA -storetype PKCS12 -keystore client.p12 -keypass cli666  -storepass cli666 -dname "CN=client,OU=China,O=client.xxx.internal,L=Beijing,S=Beijing,C=China"
+keytool -validity 365 -genkeypair -v -alias cnfcli -keyalg RSA -storetype PKCS12 -keystore client.p12 -keypass cli666  -storepass cli666 -dname "CN=client,OU=China,O=client.bittx.net,L=Beijing,S=Beijing,C=China"
 ```
 
 ### 客户端证书加入到服务器证书信任
@@ -34,6 +37,7 @@ keytool -validity 365 -genkeypair -v -alias cnfcli -keyalg RSA -storetype PKCS12
 我们必须先把客户端证书导出为一个单独的CER格式的文件，使用如下命令:
 
 ```sh
+# 将server的.cer格式的证书导入到cnfsrv.p12中
 keytool -export -v -alias cnfcli -keystore client.p12 -storetype PKCS12 -storepass cli666 -rfc -file cnfcli.cer
 keytool -import -v -alias cnfcli -file cnfcli.cer -keystore cnfsrv.p12 -storepass srv666 -noprompt
 ```
@@ -41,6 +45,7 @@ keytool -import -v -alias cnfcli -file cnfcli.cer -keystore cnfsrv.p12 -storepas
 ### 服务器证书加入客户端信任
 
 ```sh
+# 将client的.cer格式的证书导入到client.p12中
 keytool -export -v -alias cnfsrv -keystore cnfsrv.p12 -storepass srv666 -rfc -file cnfsrv.cer
 keytool -import -v -alias cnfsrv -file cnfsrv.cer -keystore client.p12 -storepass cli666 -noprompt
 ```
@@ -50,7 +55,7 @@ keytool -import -v -alias cnfsrv -file cnfsrv.cer -keystore client.p12 -storepas
 ```sh
 # 删除中间生成的cer文件
 rm *.cer
-# 查看一下client的证书是否正确的导入server.jks
+# 查看一下client的证书是否正确的导入cnfsrv.p12
 keytool -list -v -keystore cnfsrv.p12 -storepass srv666
 # 检查server的证书是否正确地导入到client.p12中
 keytool -list -v -keystore client.p12 -storepass cli666
@@ -58,12 +63,39 @@ keytool -list -v -keystore client.p12 -storepass cli666
 
 ### 配置证书文件到 http server
 
+请参照resources/config/applicaton.properties文件
 
+```properites
 
+spring.profiles.active=pro
+server.port=8443
+server.ssl.enabled=true
+server.ssl.key-store=classpath:cnfsrv.p12
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store-password=srv666
+server.ssl.key-password=srv666
+server.ssl.key-alias=cnfsrv
+server.ssl.protocol=TLSv1.2
+server.use-forward-headers=true
+server.http2.enabled=true
+
+server.undertow.worker-threads=8
+server.undertow.buffer-size=1024
+server.undertow.direct-buffers=true
+server.undertow.io-threads=4
+
+management.endpoint.mappings.enabled=true
+management.endpoints.web.exposure.include=*
+management.server.port=8443
+management.server.servlet.context-path=/admin
+
+persistence.filepath=/user/
+
+```
 
 ### 导入证书到客户端JVM
 
-导入证书到客户端的JVM中，只需要将Server.jks导出成sever.cer证书，然后直接导入到JVM中。
+导入证书到客户端的JVM中，只需要将之前生成的cnfsrv.p12导出成ca.cer证书，然后直接导入到JVM中。
 
 ```sh
 #!/usr/bin/env bash
@@ -74,12 +106,10 @@ KS=$JAVA_HOME/jre/lib/security/cacerts
 #jdk 11
 KS=$JAVA_HOME/lib/security/cacerts
 
-keytool -list -keystore $KS -storepass changeit | grep cnfsrv
-
-
-keytool -export -v -alias cnfcli -keystore client.p12 -storetype PKCS12 -storepass cli666 -rfc -file client.cer
-keytool -import -noprompt -trustcacerts -alias cnfsrv -file cnfcli.cer -keystore $KS
-keytool -list -v -keystore $KS | grep cnfsrv
+keytool -list -keystore $KS -storepass changeit | grep cnfsrv-ca
+keytool -export -v -alias cnfsrv -keystore cnfsrv.p12 -storepass srv666 -storetype PKCS12 -rfc -file ca.cer
+keytool -import -noprompt -trustcacerts -alias cnfsrv-ca -file ca.cer -keystore $KS
+keytool -list -v -keystore $KS | grep cnfsrv-ca
 ```
 
 ### 更新导入JVM的证书
@@ -100,6 +130,7 @@ KS=$JAVA_HOME/lib/security/cacerts
 keytool -list -keystore $KS -storepass changeit | grep cnfsrv
 
 # 删除cacerts中指定名称的证书(需要root权限)
+KS=$JAVA_HOME/lib/security/cacerts
 sudo keytool -delete -alias cnfsrv -keystore $KS  -storepass changeit
 
 # 导入指定证书到cacerts：
@@ -129,7 +160,7 @@ encrypt:
 
 ```sh
 #!/usr/bin/env bash
-keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.a.com,L=Beijing,S=Beijing,C=China" -keypass asinRay666 -keystore encrypt.jks -storepass asinRay666
+keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.bittx.net,L=Beijing,S=Beijing,C=China" -keypass asinRay666 -keystore encrypt.jks -storepass asinRay666
 ```
 
 Note:

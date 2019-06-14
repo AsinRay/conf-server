@@ -5,12 +5,28 @@ import java.util.Collection;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 
 /**
- * 
+ * Access decision manager.
+ *
+ * 操作FilterSecurityInterceptor这个interceptor，使用withObjectPostProcessor来设置
+ *
+ * FilterSecurityInterceptor
+ * 这个filter有几个要素，如下：
+ *
+ *    SecurityMetadataSource
+ *    AccessDecisionManager
+ *    AuthenticationManager
+ *
+ * 可以根据情况重新设置，这里我们重写一下SecurityMetadataSource用来动态获取url权限配置，
+ * 还有AccessDecisionManager来进行权限判断。
+ *
  * @author Asin Liu
+ * @since 1.0.0
+ * @version 2.0.0
  */
 public class GitRepoUserAccessDecisionManager implements AccessDecisionManager {
 
