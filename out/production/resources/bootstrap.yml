@@ -1,9 +1,0 @@
-encrypt:
-  key-store:
-    location: classpath:encrypt.jks
-    alias: asin
-    password: asinRay666
-    secret: asinRay666
-spring:
-  application:
-    name: conf-server
