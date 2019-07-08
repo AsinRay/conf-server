@@ -171,3 +171,43 @@ Warning:  Different store and key passwords not supported for PKCS12 KeyStores. 
 那么请将-keypss 和 -storepass 设置成相同即可，在yml配置时也配置相同就行了。
 
 如果您想使用不同的-keypass和-storepass，请使用jdk8版本的keytool生成jks,然后将其应用于jdk11环境下,也可使用p12格式来实现。
+
+## 证书导出
+
+在windows 系统，“运行”输入"MMC"来打开“控制台”,点击"文件->添加删除管理单元",点击“添加”按钮。
+在管理单元列表中双击“证书”点击“完成”按钮。
+回到控制台根节点，下面就是电脑中当前用户的所有证书，在操作菜单“查找证书”，双击证书，找到“复制”选项，点击导出证书选择默认的“DER编码二进制”，保存的数字证书文件 的后缀名是“CER”格式
+
+如果是服务器，请先导出成.pem格式，代码如下：
+
+```sh
+echo quit | openssl s_client -showcerts -servername confserver.xxx.internal -connect confserver.xxx.internal:8443 > cacert.pem
+```
+
+## 在linux 下转换不同类型的证书
+
+### 查看PEM编码证书
+
+```sh
+openssl x509 -in name.pem -text –noout
+```
+
+### 格式转换
+
+DER到PEM
+
+```sh
+openssl x509 -in name.cer -inform der -outform pem -out name.pem
+```
+
+PEM到DER
+
+```sh
+openssl x509 -in name.pem -outform der -out name.cer
+```
+
+### 查看DER编码证书
+
+```sh
+openssl x509 -in name.cer -inform der -text -noout
+```
