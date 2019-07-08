@@ -4,10 +4,10 @@
 
 ### 为Http Server生成SSL Key
 
-Note: 
+Note:
 
 生成jks或者p12格式的证书存储时请注意其中的O=confserver.bittx.net这个参数需要设置为客户端请求的host。
-在测试时请将confserver.bittx.net 解析到您的服务启动的ip。
+在测试时请将confserver.bittx.net 解析到您的服务监听的ip。
 
 ```sh
 #!/usr/bin/env bash
@@ -116,15 +116,9 @@ keytool -list -v -keystore $KS | grep cnfsrv-ca
 
 ```sh
 #!/usr/bin/env bash
-# 查看jvm相关信息
-java -XshowSettings:properties -version
 
-#jdk 8 的证书路径
-KS=$JAVA_HOME/jre/lib/security/cacerts
-
-#jdk 11 的证书路经
-KS=$JAVA_HOME/lib/security/cacerts
-
+JAVA_HOME=`java -XshowSettings:properties -version 2>&1 | sed '/^[[:space:]]*java\.home/!d;s/^[[:space:]]*java\.home[[:space:]]*=[[:space:]]*//'`
+KS=${JAVA_HOME}/lib/security/cacerts
 
 # 查看是否存在别名为cnfsrv的证书
 keytool -list -keystore $KS -storepass changeit | grep cnfsrv
@@ -135,6 +129,9 @@ sudo keytool -delete -alias cnfsrv -keystore $KS  -storepass changeit
 
 # 导入指定证书到cacerts：
 keytool -import　-trustcacerts -alias cnfsrv -file cnfsrv.cer -keystore $KS  -storepass changeit
+
+#  
+keytool -list -v -keystore $KS -storepass changeit | grep cnfsrv-ca
 ```
 
 ## 加密的安全
