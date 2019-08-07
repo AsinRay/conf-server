@@ -96,10 +96,10 @@ public interface MemPersistenceService extends Persistencer {
             Object obj = ois.readObject();
             t = (T) obj;
         } catch (IOException e) {
-            log.error("read data to {} failed, ", filePath, e);
+            log.warn("read data to {} failed, IOException !!", filePath);
             return null;
         } catch (ClassNotFoundException e) {
-            log.error("read data to {} failed, ", filePath, e);
+            log.warn("read data to {} failed, {}", filePath,e.getMessage());
             return null;
         }
         return t;
