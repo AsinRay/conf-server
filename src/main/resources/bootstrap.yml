@@ -2,8 +2,8 @@ encrypt:
   key-store:
     location: classpath:encrypt.jks
     alias: asin
-    password: asinRay666
-    secret: asinRay666
+    password: ${KEYSTORE_PASSWORD:AsinRay666}
+    secret: AsinRay666
 spring:
   application:
     name: conf-server

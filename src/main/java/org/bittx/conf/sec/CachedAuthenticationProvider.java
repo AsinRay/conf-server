@@ -1,38 +1,39 @@
-package com.github.asinray.sec;
-
-import java.util.Arrays;
-import java.util.Collection;
+package org.bittx.conf.sec;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Cached authentication provider for conf server authentication.
- * 
+ *
  * @author Asin Liu
+ * @since 1.0.0
  */
 public class CachedAuthenticationProvider implements AuthenticationProvider {
 
     private static final String INIT_ADMIN_NAME = "root";
     private static final String INIT_ADMIN_PSWD = "root";
 
-    /** 
+    /**
      * Default roles.
      */
     private final Collection<GrantedAuthority> authorities =  Arrays.asList(
-            new SimpleGrantedAuthority("CAN_SEARCH"), 
+            new SimpleGrantedAuthority("CAN_SEARCH"),
             new SimpleGrantedAuthority("CAN_EXPORT"),
-            new SimpleGrantedAuthority("CAN_IMPORT"), 
+            new SimpleGrantedAuthority("CAN_IMPORT"),
             new SimpleGrantedAuthority("CAN_EMPOWER"),
             new SimpleGrantedAuthority("CAN_DISCARD"));
 
-     /**
+    /**
      * Performs authentication with the same contract as
      * {@link AuthenticationManager#authenticate(Authentication)}
      * .
@@ -46,7 +47,7 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
      * @throws AuthenticationException if authentication fails.
      */
     @Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         // if(isMatch(authentication)){
         //     User user  = new User(authentication.getName(),
         //      authentication.getPrincipal().toString(),
@@ -58,9 +59,9 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
             User user = new User(authentication.getName(),authentication.getCredentials().toString(),authorities);
             return new UsernamePasswordAuthenticationToken(user,authentication.getCredentials(),authorities);
         }
-		return null;
+        return null;
     }
-    
+
     /**
      * Check if the authentication should be authenticated.
      */
@@ -69,7 +70,7 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
                 && authentication.getCredentials().equals(INIT_ADMIN_PSWD);
     }
 
-     /**
+    /**
      * Returns <code>true</code> if this <Code>AuthenticationProvider</code> supports the
      * indicated <Code>Authentication</code> object.
      * <p>
@@ -89,9 +90,8 @@ public class CachedAuthenticationProvider implements AuthenticationProvider {
      * @return <code>true</code> if the implementation can more closely evaluate the
      * <code>Authentication</code> class presented
      */
-	@Override
-	public boolean supports(Class<?> authentication) {
-		return true;
-	}
-
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return true;
+    }
 }

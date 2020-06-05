@@ -1,6 +1,7 @@
-package com.github.asinray.sec;
+package org.bittx.conf.sec;
 
-import com.github.asinray.service.MemPersistenceService;
+
+import org.bittx.conf.service.MemPersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.ConfigAttribute;
@@ -11,28 +12,30 @@ import org.springframework.util.AntPathMatcher;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.github.asinray.service.MemPersistenceService.ANT_MATCHER_STORE_FILE;
+import static org.bittx.conf.service.MemPersistenceService.ANT_MATCHER_STORE_FILE;
+
 
 /**
  * Git repository filter invocation security meta data source.
- * 
+ *
  * @author Asin Liu
  * @since 1.0.0
  * @see org.springframework.security.access.SecurityMetadataSource
  */
 public class GitRepoUserFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
+
     private static final Logger log = LoggerFactory.getLogger(GitRepoUserFilterInvocationSecurityMetadataSource.class);
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     public static final String ROLE_ROOT = "ROLE_ROOT";
     public static final String ROLE_USER = "ROLE_USER";
 
+
+    // Default config for application run first time.
     private static Map<String, String> urlRoleMap = new ConcurrentHashMap<String, String>() {
-        private static final long serialVersionUID = 1L;
         {
             put("/open/**", "ROLE_ANONYMOUS");
             put("/encrypt", ROLE_ROOT);
@@ -42,7 +45,9 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
         }
     };
 
-
+    /**
+     * Init the url -> role mapping from ant matcher store.
+     */
     public GitRepoUserFilterInvocationSecurityMetadataSource(){
         Map<String, String> map = MemPersistenceService.loadAntMatchers(ANT_MATCHER_STORE_FILE);
         if(map != null){
@@ -82,24 +87,21 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
         MemPersistenceService.updateAntMatchers(urlRoleMap);
     }
 
-
-
     /**
      * Accesses the {@code ConfigAttribute}s that apply to a given secure object.
-     * @param object the object being secured.
+     *
+     * @param object the object being secured
      * @return the attributes that apply to the passed in secured object. Should return an
-     * empty collection if there are on applicable attributes.
-     * @throws IllegalArgumentExecption if the passed object is not of a type supported by
-     *                                  the <code>SecurityMetadataSource</code> implementation.
-     * 
-     * @see org.springframework.security.access.SecurityConfig
+     * empty collection if there are no applicable attributes.
+     * @throws IllegalArgumentException if the passed object is not of a type supported by
+     *                                  the <code>SecurityMetadataSource</code> implementation
      */
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         FilterInvocation fi = (FilterInvocation) object;
         String url = fi.getRequestUrl();
         //String httpMethod = fi.getRequest().getMethod();
-        for (Entry<String, String> entry : urlRoleMap.entrySet()) {
+        for (Map.Entry<String, String> entry : urlRoleMap.entrySet()) {
             if(antPathMatcher.match(entry.getKey(),url)){
                 return SecurityConfig.createList(entry.getValue());
             }
@@ -109,12 +111,13 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
     }
 
     /**
-     * If available, return all of the {@code ConfigAttribute}s defined by the
+     * If available, returns all of the {@code ConfigAttribute}s defined by the
      * implementing class.
      * <p>
      * This is used by the {@link AbstractSecurityInterceptor} to perform startup time
-     * validation of each {@code ConfigAttribute} configured agaiinst it.
-     * @return the {@code ConfigAttribute}s or {@code null} if unsupported.
+     * validation of each {@code ConfigAttribute} configured against it.
+     *
+     * @return the {@code ConfigAttribute}s or {@code null} if unsupported
      */
     @Override
     public Collection<ConfigAttribute> getAllConfigAttributes() {
@@ -132,5 +135,4 @@ public class GitRepoUserFilterInvocationSecurityMetadataSource implements Filter
     public boolean supports(Class<?> clazz) {
         return FilterInvocation.class.isAssignableFrom(clazz);
     }
-
 }

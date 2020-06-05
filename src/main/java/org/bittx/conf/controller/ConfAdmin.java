@@ -1,6 +1,8 @@
-package com.github.asinray.controller;
+package org.bittx.conf.controller;
 
-import com.github.asinray.service.ApiService;
+
+
+import org.bittx.conf.service.ApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST API of the config server.
- * 
+ *
  * @author Asin Ray
  * @since 1.0.0
  */
@@ -28,7 +30,7 @@ public class ConfAdmin {
 
     /**
      * Change the root password
-     * 
+     *
      * @param oldpass   old password of root
      * @param newpass   new password to be reset to root.
      */
@@ -39,8 +41,8 @@ public class ConfAdmin {
     }
 
     /**
-    * Generate a new token.
-    */
+     * Generate a new token.
+     */
     @RequestMapping("token")
     public String genNewToken(){
         return apiService.genSecToken();
@@ -58,8 +60,8 @@ public class ConfAdmin {
     }
 
     /**
-     * Get the token of specified repostory.
-     * 
+     * Get the token of specified repository.
+     *
      * @param repo  repostory
      */
     @RequestMapping("{repo}/token")
@@ -67,7 +69,7 @@ public class ConfAdmin {
         return apiService.getRepoToken(repo);
     }
 
-     /**
+    /**
      * Delete the repo and token.
      * @param repo  repository
      */
@@ -76,10 +78,13 @@ public class ConfAdmin {
         return apiService.removeRepoToken(repo);
     }
 
-
+    /**
+     * Check if the repository exist.
+     * @param repo
+     * @return
+     */
     @RequestMapping("{repo}/exist")
     public boolean repoExist(@PathVariable("repo") String repo){
         return apiService.repoExists(repo);
     }
-
 }

@@ -1,6 +1,6 @@
-package com.github.asinray;
+package org.bittx.conf;
 
-import com.github.asinray.sec.SecGenerator;
+import org.bittx.conf.sec.SecGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,13 +10,13 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-
 /**
- * Conf server.
- * @author Asin Liu
- * @version 1.0.0
- * @since 2.0.0
+ * Conf Server with https support.
+ * @author: Asin Ray
+ *
+ * @since 1.0.0
  */
+
 @EnableConfigServer
 @SpringBootApplication(exclude ={SecurityAutoConfiguration.class} )
 public class Boot {

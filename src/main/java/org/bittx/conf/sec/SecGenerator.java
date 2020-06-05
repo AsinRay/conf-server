@@ -1,4 +1,4 @@
-package com.github.asinray.sec;
+package org.bittx.conf.sec;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;

@@ -1,23 +1,23 @@
-package com.github.asinray.service;
+package org.bittx.conf.service;
 
-import com.github.asinray.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+
+import org.bittx.conf.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
 
 /**
  * ApiService for admin controller.
@@ -59,7 +59,11 @@ public class ApiService {
             if (ud != null && ud.getPassword().equals(oldPassword)) {
                 inMemoryUserDetailsManager.updatePassword(ud, newPassword);
                 MemPersistenceService.updateUsers(extractPersistenceUsers(inMemoryUserDetailsManager));
+                log.info("User {} password has changed ",userName);
                 return true;
+            }
+            else{
+                log.warn("Update password failed, the given password not match.");
             }
         } catch (Exception e) {
             //TODO: handle exception
@@ -248,7 +252,7 @@ public class ApiService {
     /**
      * Parse token.
      *
-     * @param token token to be parse, must be formatted {@link ApiService#TOKEN_PATTERN.pattern()}
+     * @param token token to be parse, must be formatted {@link ApiService#TOKEN_PATTERN}
      * @return
      */
     private Map<String, String> parseToken(String token) {

@@ -1,8 +1,8 @@
-package com.github.asinray.conf;
+package org.bittx.conf.cnf;
 
-import com.github.asinray.sec.GitRepoUserAccessDecisionManager;
-import com.github.asinray.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
 
+import org.bittx.conf.sec.GitRepoUserAccessDecisionManager;
+import org.bittx.conf.sec.GitRepoUserFilterInvocationSecurityMetadataSource;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,17 +10,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
+
 /**
- * 
+ *
  * AdminWebSecurityConfigurationAdapter
- * 
+ *
  * Web security configuration for ot.
 
  * <p>
  * Multiple HttpSecurity instances config:
  * <code>
  *
- * @Order(1) 
+ * @Order(1)
  * public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
  *      protected void configure(HttpSecurity http) throws Exception {
  *          http.antMatcher("/open/**")
@@ -60,14 +61,25 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 @EnableWebSecurity
 @Order(1)
 public class WebSecConfAdapter extends WebSecurityConfigurerAdapter {
-
+    /**
+     * Override this method to configure the {@link HttpSecurity}. Typically subclasses
+     * should not invoke this method by calling super as it may override their
+     * configuration. The default configuration is:
+     *
+     * <pre>
+     * http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().httpBasic();
+     * </pre>
+     *
+     * @param http the {@link HttpSecurity} to modify
+     * @throws Exception if an error occurs
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // super.configure(http);
+        //super.configure(http);
         http.formLogin().disable();
         http.csrf().disable();
         http.antMatcher("/**").authorizeRequests().anyRequest().authenticated().withObjectPostProcessor(
-            new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                new ObjectPostProcessor<FilterSecurityInterceptor>() {
                     /**
                      * Initialize the object possibly returning a modified instance that should be
                      * used instead.
@@ -81,7 +93,6 @@ public class WebSecConfAdapter extends WebSecurityConfigurerAdapter {
                         fsi.setAccessDecisionManager(new GitRepoUserAccessDecisionManager());
                         return fsi;
                     }
-            }).and().httpBasic();
+                }).and().httpBasic();
     }
-    
 }

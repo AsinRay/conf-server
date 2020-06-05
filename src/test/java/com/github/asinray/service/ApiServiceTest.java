@@ -1,5 +1,6 @@
 package com.github.asinray.service;
 
+import org.bittx.conf.service.ApiService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 import java.util.Properties;
 
-import static com.github.asinray.service.ApiService.TOKEN_PATTERN;
+import static org.bittx.conf.service.ApiService.TOKEN_PATTERN;
+
 
 /**
  * ApiServiceTest
@@ -23,7 +25,7 @@ import static com.github.asinray.service.ApiService.TOKEN_PATTERN;
 
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes ={ApiServiceTest.TestContextConfiguration.class,ApiService.class})
+@ContextConfiguration(classes ={ApiServiceTest.TestContextConfiguration.class, ApiService.class})
 public class ApiServiceTest {
 
     @Configuration

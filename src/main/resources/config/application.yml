@@ -3,7 +3,7 @@ spring:
     config:
       server:
         git:
-          #uri: https://
-          # uri conf for native git.
-          uri: ${HOME}/conf-repo
+          # uri: https://
+          # uri conf for local file with git.
+          uri: ${HOME}/config-repo
           basedir: target/config

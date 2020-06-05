@@ -1,10 +1,11 @@
-package com.github.asinray.service;
+package org.bittx.conf.service;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,68 +13,106 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-
 /**
  * Persistence Service persistence the data to file .
  *
  * @version 2.0
  * @author: Asin Liu
  */
-
-
 public interface MemPersistenceService extends Persistencer {
-
     Logger log = LoggerFactory.getLogger(MemPersistenceService.class);
 
     String USER_HOME = System.getProperty("user.home");
     String DEF_SEC_PATH = USER_HOME.concat("/.sec/");
+    // user info store
     String USER_STORE_FILE = DEF_SEC_PATH.concat(".udl");
+    // repo store
     String REPO_TOKEN_STORE_FILE = DEF_SEC_PATH.concat(".atm");
+    // ant matcher store
     String ANT_MATCHER_STORE_FILE = DEF_SEC_PATH.concat(".am");
 
-
+    /**
+     * load user from user info store
+     * @param filePath
+     * @return
+     */
     static List<User> loadUsers(String filePath) {
         return loadFromFile(filePath);
     }
 
+    /**
+     * Update user info on running collection, and then persist to user info store
+     * @param list
+     * @param filePath  user's defined user info store
+     * @return
+     */
     static boolean updateUsers(List<User> list, String filePath) {
         return persistenceObject2File(list, filePath);
     }
 
-
+    /**
+     * Update user info, and then persist to default user info store
+     * @param list
+     * @return
+     */
     static boolean updateUsers(List<User> list) {
         return persistenceObject2File(list, USER_STORE_FILE);
     }
 
+    /**
+     * Load ant matchers from specified file.
+     * @param filePath  file which store ant matchers
+     * @return
+     */
     static Map<String, String> loadAntMatchers(String filePath) {
         return loadFromFile(filePath);
     }
 
 
+    /**
+     * Update ant matchers and persist it to file
+     * @param antMatchers   ant matchers to be persist.
+     * @param filePath      the file which ant matchers persist to.
+     * @return
+     */
     static boolean updateAntMatchers(Map<String, String> antMatchers, String filePath) {
         return persistenceObject2File(antMatchers, filePath);
     }
 
+    /**
+     * Update ant matchers and persist it to default ant matcher store.
+     * @param antMatchers   ant matchers to be persist.
+     * @return
+     */
     static boolean updateAntMatchers(Map<String, String> antMatchers) {
         return persistenceObject2File(antMatchers, ANT_MATCHER_STORE_FILE);
     }
 
-
+    /**
+     * Load repo store from file
+     * @param filePath  file
+     * @return
+     */
     static Map<String, String> loadRepoTokenMap(String filePath) {
         return loadFromFile(filePath);
     }
 
 
-
+    /**
+     * Update repo store and persist it to specified repo token store.
+     * @param repoTokenMap  repo token store to be persist.
+     * @param filePath
+     * @return
+     */
     static boolean updateRepoTokenMap(Map<String,String> repoTokenMap, String filePath) {
         return persistenceObject2File(repoTokenMap, filePath);
     }
 
+    /**
+     * Update repo store and persist it to default repo token store.
+     * @param repoTokenMap  repo store map to be persist.
+     * @return
+     */
     static boolean updateRepoTokenMap(Map<String,String> repoTokenMap) {
         return persistenceObject2File(repoTokenMap, REPO_TOKEN_STORE_FILE);
     }
