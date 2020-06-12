@@ -67,7 +67,7 @@ As you can see, we used a `encrypt.jks` to store security information.
 
 ```sh
 #!/usr/bin/env bash
-keytool -genkeypair -alias asin -keyalg RSA -dname "CN=Web Server,OU=China,O=www.bittx.net,L=Beijing,S=Beijing,C=China" -keypass kpAsinRay666 -keystore encrypt.jks -storepass spAsinRay666
+ju
 ```
 
 Attention:

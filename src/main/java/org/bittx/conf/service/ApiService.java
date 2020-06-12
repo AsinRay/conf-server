@@ -33,7 +33,7 @@ public class ApiService {
 
     private static ConcurrentHashMap<String, String> repoTokenMap = new ConcurrentHashMap<>();
 
-    public static Pattern TOKEN_PATTERN = Pattern.compile("^[0-9A-Za-z]{32}:2a08?[.0-9A-Za-z]{52,53}@$");
+    public static Pattern TOKEN_PATTERN = Pattern.compile("^[0-9A-Za-z]{32}:2a08?[.0-9A-Za-z]{50,59}@$");
 
     private static final int seed = 2;
     private static final int round = seed << seed;
@@ -235,9 +235,17 @@ public class ApiService {
      */
     public boolean removeRepoToken(String repo) {
         try {
+            if (repoTokenMap.isEmpty()) {
+                log.warn("Application {} is not found, remove repository failed.");
+                return false;
+            }
             String token = repoTokenMap.get(repo);
             String auth0 = parseToken(token).get(AUTH0);
 
+            if (auth0 == null || "".equals(auth0)) {
+                log.warn("User {} not found, remove repo token failed.");
+                return false;
+            }
             inMemoryUserDetailsManager.deleteUser(auth0);       // step : 1
             GitRepoUserFilterInvocationSecurityMetadataSource.removeMatcher(auth0); // step : 2
             removeRepoTokenMapping(repo);   // step : 3

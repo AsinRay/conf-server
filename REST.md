@@ -22,7 +22,7 @@ echo "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 # add/{repo}/{token}
 # repo  is the repository and the token is generte by last step /admin/token
-curl --cacert cacert.pem  https:/root:toor@cnf.x.com:8443/add/{repo}/{token}
+curl --cacert cacert.pem  https:/root:toor@cnf.x.com:8443/admin/add/{repo}/{token}
 
 # Query the token of given repository
 

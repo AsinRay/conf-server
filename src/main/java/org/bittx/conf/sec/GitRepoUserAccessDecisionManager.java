@@ -45,6 +45,7 @@ public class GitRepoUserAccessDecisionManager implements AccessDecisionManager {
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
             throws AccessDeniedException, InsufficientAuthenticationException {
 
+        System.out.println(authentication.getAuthorities());
         final boolean matched = configAttributes.stream()
                 .anyMatch(o->hasRole(authentication,o.getAttribute()));
         // 该url配置的有权限，但登录用户没有match到对应权限，则禁止访问
